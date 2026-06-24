@@ -720,10 +720,29 @@ function findTsumo(me,target,mySeat,targetSeat,bonus){
   }
   return "役満ツモでも届かない";
 }
-function calcCondition(){let me=parseInt(document.getElementById("cond-me").value||0),target=parseInt(document.getElementById("cond-target").value||0),mySeat=document.getElementById("cond-my-seat").value,targetSeat=document.getElementById("cond-target-seat").value,honba=parseInt(document.getElementById("cond-honba").value||0),kyotaku=parseInt(document.getElementById("cond-kyotaku").value||0);let bonus=honba*300+kyotaku*1000;let diff=target-me;document.getElementById("cond-diff").innerText=diff>0?fmt(diff)+"点ビハインド":fmt(Math.abs(diff))+"点リード";let ron=findRon(me,target,mySeat,false,bonus),direct=findRon(me,target,mySeat,true,bonus),tsumo=findTsumo(me,target,mySeat,targetSeat,bonus);document.getElementById("cond-ron").innerText=ron;document.getElementById("cond-direct").innerText=direct;document.getElementById("cond-tsumo").innerText=tsumo;if(diff<0){document.getElementById("cond-minimum").innerText="すでに上回ってるにゃ";setCommentCatByName("condition-cat", "ニンマリ猫");
-document.getElementById("condition-comment").innerText=randomComment("conditionLead");}else if([ron,direct,tsumo].some(x=>!x.includes("届かない"))){document.getElementById("cond-minimum").innerText="どれかでまくれるにゃ";setCommentCatByName("condition-cat", "あんぐり猫");
-document.getElementById("condition-comment").innerText=randomComment("conditionGood");}else{document.getElementById("cond-minimum").innerText="かなり厳しいにゃ";setCommentCatByName("condition-cat", "面白顔猫");
-document.getElementById("condition-comment").innerText=randomComment("conditionBad");}document.getElementById("cond-tsumo-sub").innerText=
+
+function setConditionDifficultyCat(resultText){
+  const easy = ["1000","1300","2000","2600"];
+  const normal = ["3900","5200","7700","8000","満貫"];
+
+  if(easy.some(x => resultText.includes(x))){
+    setCommentCatByName("condition-cat","ニンマリ猫");
+    document.getElementById("condition-comment").innerText="ニンマリできる条件にゃ 😏";
+  }else if(normal.some(x => resultText.includes(x))){
+    setCommentCatByName("condition-cat","あんぐり猫");
+    document.getElementById("condition-comment").innerText="まだ戦えるにゃ 🔥";
+  }else{
+    setCommentCatByName("condition-cat","面白顔猫");
+    document.getElementById("condition-comment").innerText="なかなか遠いにゃ 🤣";
+  }
+}
+
+function calcCondition(){let me=parseInt(document.getElementById("cond-me").value||0),target=parseInt(document.getElementById("cond-target").value||0),mySeat=document.getElementById("cond-my-seat").value,targetSeat=document.getElementById("cond-target-seat").value,honba=parseInt(document.getElementById("cond-honba").value||0),kyotaku=parseInt(document.getElementById("cond-kyotaku").value||0);let bonus=honba*300+kyotaku*1000;let diff=target-me;document.getElementById("cond-diff").innerText=diff>0?fmt(diff)+"点ビハインド":fmt(Math.abs(diff))+"点リード";let ron=findRon(me,target,mySeat,false,bonus),direct=findRon(me,target,mySeat,true,bonus),tsumo=findTsumo(me,target,mySeat,targetSeat,bonus);document.getElementById("cond-ron").innerText=ron;document.getElementById("cond-direct").innerText=direct;document.getElementById("cond-tsumo").innerText=tsumo;
+
+let bestCondition = ron;
+if(bestCondition.includes("届かない")) bestCondition = direct;
+if(bestCondition.includes("届かない")) bestCondition = tsumo;
+setConditionDifficultyCat(bestCondition);if(diff<0){document.getElementById("cond-minimum").innerText="すでに上回ってるにゃ";}else if([ron,direct,tsumo].some(x=>!x.includes("届かない"))){document.getElementById("cond-minimum").innerText="どれかでまくれるにゃ";}else{document.getElementById("cond-minimum").innerText="かなり厳しいにゃ";}document.getElementById("cond-tsumo-sub").innerText=
   "自分：" + (mySeat==="parent"?"親":"子") +
   " / 相手：" + (targetSeat==="parent"?"親":"子") +
   "。本場・供託込みで判定するにゃ。";}
