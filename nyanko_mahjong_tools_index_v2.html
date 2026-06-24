@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>にゃんこ麻雀ツール集</title>
+<style>
+* { box-sizing: border-box; }
+:root{
+  --green:#4F8F6A;
+  --deep:#2F6B4F;
+  --pale:#DDEFE2;
+  --paper:#FFFDF8;
+  --red:#C84B31;
+  --brown:#3D2A22;
+  --cream:#FFF8EC;
+  --gold:#FFD08A;
+  --fire:#D6432C;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;
+  margin:0;
+  padding:10px;
+  min-height:100vh;
+  color:#2F4A3A;
+  background:
+    radial-gradient(circle at 10% 12%, rgba(255,255,255,.22) 0 18px, transparent 19px),
+    radial-gradient(circle at 88% 18%, rgba(255,255,255,.18) 0 24px, transparent 25px),
+    linear-gradient(180deg,#DDEFE2,#C8E3D0);
+}
+.app{
+  max-width:460px;
+  margin:0 auto;
+  background:var(--paper);
+  border:4px solid var(--green);
+  border-radius:28px;
+  padding:14px;
+  box-shadow:0 8px 0 #B7D7C0,0 14px 24px rgba(47,107,79,.14);
+  position:relative;
+  overflow:hidden;
+}
+.app::before{
+  content:"🐾 🐾 🐾";
+  position:absolute;
+  top:110px;
+  right:-10px;
+  font-size:38px;
+  opacity:.06;
+  transform:rotate(-16deg);
+}
+.app::after{
+  content:"🀄";
+  position:absolute;
+  bottom:16px;
+  left:12px;
+  font-size:70px;
+  opacity:.045;
+  transform:rotate(12deg);
+}
+.app > *{ position:relative; z-index:1; }
+.signboard{
+  background:linear-gradient(180deg,#FFFFFF,#F6FBF7);
+  border:3px solid var(--green);
+  border-radius:22px;
+  padding:10px 8px;
+  box-shadow:inset 0 -4px 0 rgba(79,143,106,.14),0 4px 0 #D6EADC;
+  text-align:center;
+  margin-bottom:10px;
+}
+h1{ margin:0; color:var(--red); font-size:22px; }
+.subtitle{ margin-top:3px; font-size:11px; color:#456B55; }
+.neko{ text-align:center; font-size:32px; margin:7px 0 10px; }
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:7px;
+  margin-bottom:10px;
+}
+.tab{
+  border:2px solid #B7D7C0;
+  border-radius:16px;
+  background:#F8FCF9;
+  padding:8px 4px;
+  font-size:12px;
+  font-weight:900;
+  color:#456B55;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+}
+.tab.active{
+  background:#FFE4DC;
+  border-color:var(--red);
+  color:#A83B27;
+  box-shadow:inset 0 -3px 0 rgba(200,75,49,.12);
+}
+.tool{ display:none; }
+.tool.active{ display:block; }
+.input-box{
+  background:#FFFFFF;
+  border:3px solid #B7D7C0;
+  border-radius:22px;
+  padding:10px;
+  margin-bottom:10px;
+  box-shadow:0 4px 0 #D6EADC;
+}
+label{ display:block; font-weight:900; color:var(--red); margin-bottom:6px; font-size:14px; }
+select,input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:999px;
+  border:3px solid var(--green);
+  font-size:15px;
+  background:var(--paper);
+  color:#2F4A3A;
+  outline:none;
+}
+.row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid{ display:grid; grid-template-columns:1fr 84px; gap:6px; align-items:center; margin-bottom:6px; }
+.grid:last-child{ margin-bottom:0; }
+.grid-label{ font-size:13px; font-weight:800; color:#456B55; }
+.small-select{ padding:7px 10px; font-size:13px; }
+details{ margin-top:8px; }
+details summary{ cursor:pointer; font-weight:900; color:var(--red); outline:none; font-size:14px; }
+.info-box,.note{
+  background:#F8FCF9;
+  border:2px dashed #B7D7C0;
+  border-radius:18px;
+  padding:9px 10px;
+  margin-top:8px;
+  font-size:12px;
+  line-height:1.52;
+  color:#456B55;
+}
+.info-box p{ margin:6px 0; }
+.results{
+  background:linear-gradient(180deg,var(--green),var(--deep));
+  border-radius:24px;
+  padding:12px;
+  margin-top:10px;
+  box-shadow:0 6px 0 #244F3B;
+  border:2px solid #6FA982;
+}
+.result-title{ color:#fff; font-size:17px; font-weight:900; margin-bottom:10px; text-align:center; }
+.result-item{
+  background:var(--paper);
+  color:#2F4A3A;
+  border-radius:18px;
+  padding:9px 12px;
+  margin-bottom:7px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border:2px solid #D6EADC;
+  box-shadow:0 3px 0 rgba(183,215,192,.85);
+  position:relative;
+  overflow:hidden;
+}
+.result-item::after{ content:"🐾"; position:absolute; right:10px; bottom:-10px; font-size:34px; opacity:.05; transform:rotate(-10deg); }
+.result-item:last-child{ margin-bottom:0; }
+.result-label{ font-size:14px; font-weight:800; position:relative; z-index:1; }
+.score{ font-size:18px; font-weight:900; color:var(--red); text-align:right; position:relative; z-index:1; }
+.footer{ text-align:center; margin-top:12px; color:#456B55; font-size:12px; }
+.firebox{
+  background:linear-gradient(180deg,#D6432C,#7B211A);
+  box-shadow:0 6px 0 #421B1B;
+  border:2px solid #FFB15B;
+}
+.fire-input{ border-color:#E7A15B; box-shadow:0 4px 0 #F2C080; background:#FFF8EC; }
+.fire-input input,.fire-input select{ border-color:#D6432C; color:#3D2A22; background:#FFFFFF; }
+.summary{
+  background:#FFF8EC;
+  color:#3D2A22;
+  border-radius:20px;
+  padding:13px 12px;
+  margin-bottom:9px;
+  border:2px solid #FFD08A;
+  box-shadow:0 3px 0 rgba(255,208,138,.85);
+  text-align:center;
+}
+.big{ font-size:24px; font-weight:900; color:#B9231B; }
+.condition{
+  background:#FFF8EC;
+  color:#3D2A22;
+  border-radius:18px;
+  padding:11px 12px;
+  margin-bottom:8px;
+  border:2px solid #FFD08A;
+  box-shadow:0 3px 0 rgba(255,208,138,.8);
+}
+.cond-head{ font-size:13px; font-weight:900; color:#7A3C28; margin-bottom:4px; }
+.cond-main{ font-size:20px; font-weight:900; color:#B9231B; }
+.cond-sub{ margin-top:3px; font-size:12px; color:#7A3C28; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="signboard">
+    <h1>にゃんこ麻雀ツール集 🐾</h1>
+    <div class="subtitle">スマホでサクッと使える3点セット</div>
+  </div>
+  <div class="neko">🐈 🀄 🐈‍⬛</div>
+
+  <div class="tabs">
+    <div class="tab active" data-tool="fuTool">ふけいさん</div>
+    <div class="tab" data-tool="quickTool">早いネコ</div>
+    <div class="tab" data-tool="condTool">条件ネコ</div>
+  </div>
+
+  <section id="fuTool" class="tool active">
+    <div class="input-box"><label>はんすう 🀄</label><select id="fuHan"><option value="1">1翻</option><option value="2">2翻</option><option value="3" selected>3翻</option><option value="4">4翻</option><option value="5">5翻以上</option><option value="6">6-7翻</option><option value="8">8-10翻</option><option value="11">11-12翻</option><option value="13">13翻〜 👑🐈</option></select></div>
+    <div class="input-box"><label>あがり方 🐾</label><select id="fuWin"><option value="closedRon">メンゼンロン</option><option value="openRon">鳴きロン</option><option value="tsumo">ツモ</option></select></div>
+    <div class="row"><div class="input-box"><label>頭 🐱</label><select id="fuHead"><option value="0">通常</option><option value="2">役牌</option><option value="4">ダブ風</option></select></div><div class="input-box"><label>待ち 🐾</label><select id="fuWait"><option value="0">両面</option><option value="2">愚形・単騎</option></select></div></div>
+    <div class="input-box">
+      <details><summary>刻子・カン 🀄</summary><br>
+        <div class="grid"><div class="grid-label">明刻（中張牌）</div><select class="small-select fuPart" data-fu="2"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">明刻（ヤオ九・字牌）</div><select class="small-select fuPart" data-fu="4"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">暗刻（中張牌）</div><select class="small-select fuPart" data-fu="4"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">暗刻（ヤオ九・字牌）</div><select class="small-select fuPart" data-fu="8"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">明カン（中張牌）</div><select class="small-select fuPart" data-fu="8"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">明カン（ヤオ九・字牌）</div><select class="small-select fuPart" data-fu="16"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">暗カン（中張牌）</div><select class="small-select fuPart" data-fu="16"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+        <div class="grid"><div class="grid-label">暗カン（ヤオ九・字牌）</div><select class="small-select fuPart" data-fu="32"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+      </details>
+    </div>
+    <div class="input-box"><label>特殊形 👑</label><select id="fuSpecial"><option value="none">なし</option><option value="chitoi">七対子</option><option value="pinfuTsumo">平和ツモ</option></select></div>
+    <div class="results"><div class="result-title">🐱 計算結果にゃ！</div><div class="result-item"><span class="result-label">🐾 符</span><span class="score" id="fuResult">-</span></div><div class="result-item"><span class="result-label">🐈 子ロン</span><span class="score" id="fuKoRon">-</span></div><div class="result-item"><span class="result-label">🐟 子ツモ</span><span class="score" id="fuKoTsumo">-</span></div><div class="result-item"><span class="result-label">👑 親ロン</span><span class="score" id="fuOyaRon">-</span></div><div class="result-item"><span class="result-label">🐾 親ツモ</span><span class="score" id="fuOyaTsumo">-</span></div></div>
+    <div class="note" id="fuMemo">補助輪メモがここに表示されるにゃ。</div>
+  </section>
+
+  <section id="quickTool" class="tool">
+    <div class="input-box"><label>はんすう 🀄</label><select id="qHan"><option value="1">1翻</option><option value="2">2翻</option><option value="3" selected>3翻</option><option value="4">4翻</option><option value="5">5翻 (満貫)</option><option value="6">6-7翻 (跳満)</option><option value="8">8-10翻 (倍満)</option><option value="11">11-12翻 (三倍満)</option><option value="13">13翻〜 👑🐈</option></select></div>
+    <div class="input-box"><label>ふすう 🐾</label><select id="qFu"><option value="20">20符</option><option value="25">25符 (七対子)</option><option value="30" selected>30符</option><option value="40">40符</option><option value="50">50符</option><option value="60">60符</option><option value="70">70符</option><option value="80">80符</option><option value="90">90符</option><option value="100">100符</option></select>
+      <details><summary>🐾 符のざっくり目安</summary><div class="info-box"><p><b>30符：</b>迷ったらここ。ロン平和も30符。</p><p><b>20符：</b>平和ツモ専用。</p><p><b>25符：</b>七対子専用。</p><p><b>40符：</b>役牌ポン、愚形待ち、明刻など。</p><p><b>50符以上：</b>暗刻・カン・役牌複数で重い時。</p></div></details>
+      <details><summary>📖 符一覧</summary><div class="info-box"><p><b>基本符：</b>20符スタート</p><p><b>切り上げ：</b>最後に10符単位へ切り上げ</p><p><b>七対子：</b>25符固定</p><p><b>平和ツモ：</b>20符固定</p><p><b>ロン平和：</b>30符</p><p><b>メンゼンロン：</b>+10</p><p><b>ツモ：</b>+2</p><p><b>役牌頭：</b>+2 / ダブ風頭 +4</p><p><b>愚形待ち：</b>+2</p><p><b>明刻（中張牌）：</b>+2</p><p><b>明刻（ヤオ九・字牌）：</b>+4</p><p><b>暗刻（中張牌）：</b>+4</p><p><b>暗刻（ヤオ九・字牌）：</b>+8</p><p><b>明カン（中張牌）：</b>+8</p><p><b>明カン（ヤオ九・字牌）：</b>+16</p><p><b>暗カン（中張牌）：</b>+16</p><p><b>暗カン（ヤオ九・字牌）：</b>+32</p></div></details>
+    </div>
+    <div class="results"><div class="result-title">🐱 点数にゃ！</div><div class="result-item"><span class="result-label">🐾 子ロン</span><span class="score" id="qKoRon">-</span></div><div class="result-item"><span class="result-label">🐈 子ツモ</span><span class="score" id="qKoTsumo">-</span></div><div class="result-item"><span class="result-label">👑 親ロン</span><span class="score" id="qOyaRon">-</span></div><div class="result-item"><span class="result-label">🐟 親ツモ</span><span class="score" id="qOyaTsumo">-</span></div></div>
+  </section>
+
+  <section id="condTool" class="tool">
+    <div class="input-box fire-input"><label>自分の持ち点 🐾</label><input type="number" id="cMe" value="24500"></div>
+    <div class="input-box fire-input"><label>まくりたい相手の点数 👑</label><input type="number" id="cTarget" value="38700"></div>
+    <div class="row"><div class="input-box fire-input"><label>自分 🐈</label><select id="cMySeat"><option value="child">子</option><option value="parent">親</option></select></div><div class="input-box fire-input"><label>相手 🐈‍⬛</label><select id="cTargetSeat"><option value="child">子</option><option value="parent">親</option></select></div></div>
+    <div class="results firebox"><div class="result-title">🐱 まくれるかにゃ？</div><div class="summary"><div>現在差</div><div class="big" id="cDiff">-</div><div id="cMinimum">-</div></div><div class="condition"><div class="cond-head">🐾 ロン条件</div><div class="cond-main" id="cRon">-</div><div class="cond-sub">相手以外からロン。相手の点数は減らないにゃ。</div></div><div class="condition"><div class="cond-head">🔥 直撃条件</div><div class="cond-main" id="cDirect">-</div><div class="cond-sub">相手からロン。自分加点＋相手失点で一番まくりやすいにゃ。</div></div><div class="condition"><div class="cond-head">🐈 ツモ条件</div><div class="cond-main" id="cTsumo">-</div><div class="cond-sub" id="cTsumoSub">ツモ時の相手支払いを反映してるにゃ。</div></div></div>
+    <div class="note" id="cNote">同点不可。相手を100点以上上回る条件で判定。</div>
+  </section>
+
+  <div class="footer">今日も良い手が入りますように 🐈</div>
+</div>
+<script>
+function ceil100(n){return Math.ceil(n/100)*100;}
+function ceil10(n){return Math.ceil(n/10)*10;}
+function scoreCalc(fu,han){
+  let base;
+  if(han>=13) base=8000; else if(han>=11) base=6000; else if(han>=8) base=4000; else if(han>=6) base=3000; else if(han>=5) base=2000; else { base=fu*Math.pow(2,han+2); if(base>=2000||(han===4&&fu>=30)||(han===3&&fu>=60)) base=2000; }
+  let s={koRon:ceil100(base*4),oyaRon:ceil100(base*6),koTsumoKo:ceil100(base),koTsumoOya:ceil100(base*2),oyaTsumo:ceil100(base*2)};
+  if(fu===25&&han===2){s.koRon=1600;s.oyaRon=2400;s.koTsumoKo=400;s.koTsumoOya=800;s.oyaTsumo=800;}
+  return s;
+}
+function setText(id,t){document.getElementById(id).innerText=t;}
+function calcFuTool(){
+  const special=document.getElementById('fuSpecial').value;
+  let fu,memo;
+  if(special==='chitoi'){fu=25;memo='七対子は25符固定にゃ。';}
+  else if(special==='pinfuTsumo'){fu=20;memo='平和ツモは20符固定にゃ。';}
+  else{
+    let raw=20, m=[];
+    if(document.getElementById('fuWin').value==='closedRon'){raw+=10;m.push('メンゼンロン +10');}
+    if(document.getElementById('fuWin').value==='tsumo'){raw+=2;m.push('ツモ +2');}
+    const h=parseInt(document.getElementById('fuHead').value); if(h){raw+=h;m.push((h===4?'ダブ風頭':'役牌頭')+' +'+h);}
+    const w=parseInt(document.getElementById('fuWait').value); if(w){raw+=w;m.push('愚形/単騎 +2');}
+    document.querySelectorAll('.fuPart').forEach(el=>{const count=parseInt(el.value), part=parseInt(el.dataset.fu); if(count>0){raw+=count*part;m.push(count*part+'符');}});
+    fu=ceil10(raw); memo=(m.length?m.join(' / '):'基本20符')+' → '+raw+'符 → '+fu+'符';
+  }
+  const han=parseInt(document.getElementById('fuHan').value), s=scoreCalc(fu,han);
+  setText('fuResult','🐾 '+fu+'符'); setText('fuKoRon','🐈 '+s.koRon+' 点'); setText('fuKoTsumo','🐟 '+s.koTsumoKo+' / '+s.koTsumoOya); setText('fuOyaRon','👑 '+s.oyaRon+' 点'); setText('fuOyaTsumo','🐾 '+s.oyaTsumo+' ALL'); setText('fuMemo',memo);
+}
+function calcQuick(){
+  const han=parseInt(document.getElementById('qHan').value), fu=parseInt(document.getElementById('qFu').value);
+  if((han===1&&fu===20)||(han===1&&fu===25)){['qKoRon','qKoTsumo','qOyaRon','qOyaTsumo'].forEach(id=>setText(id,'-'));return;}
+  const s=scoreCalc(fu,han);
+  setText('qKoRon','🐾 '+s.koRon+' 点'); setText('qKoTsumo','🐈 '+s.koTsumoKo+' / '+s.koTsumoOya); setText('qOyaRon','👑 '+s.oyaRon+' 点'); setText('qOyaTsumo','🐟 '+s.oyaTsumo+' ALL');
+}
+const ronChild=[{name:'1000ロン',point:1000},{name:'2000ロン',point:2000},{name:'3900ロン',point:3900},{name:'5200ロン',point:5200},{name:'満貫ロン',point:8000},{name:'跳満ロン',point:12000},{name:'倍満ロン',point:16000},{name:'三倍満ロン',point:24000},{name:'役満ロン',point:32000}];
+const ronParent=[{name:'1500ロン',point:1500},{name:'2900ロン',point:2900},{name:'5800ロン',point:5800},{name:'満貫ロン',point:12000},{name:'跳満ロン',point:18000},{name:'倍満ロン',point:24000},{name:'三倍満ロン',point:36000},{name:'役満ロン',point:48000}];
+const tsumoChild=[{name:'500 / 1000ツモ',gain:2000,childPay:500,parentPay:1000},{name:'1000 / 2000ツモ',gain:4000,childPay:1000,parentPay:2000},{name:'1300 / 2600ツモ',gain:5200,childPay:1300,parentPay:2600},{name:'2000 / 4000ツモ',gain:8000,childPay:2000,parentPay:4000},{name:'3000 / 6000ツモ',gain:12000,childPay:3000,parentPay:6000},{name:'4000 / 8000ツモ',gain:16000,childPay:4000,parentPay:8000},{name:'6000 / 12000ツモ',gain:24000,childPay:6000,parentPay:12000},{name:'8000 / 16000ツモ',gain:32000,childPay:8000,parentPay:16000}];
+const tsumoParent=[{name:'1000 ALL',gain:3000,childPay:1000},{name:'2000 ALL',gain:6000,childPay:2000},{name:'4000 ALL',gain:12000,childPay:4000},{name:'6000 ALL',gain:18000,childPay:6000},{name:'8000 ALL',gain:24000,childPay:8000},{name:'12000 ALL',gain:36000,childPay:12000},{name:'16000 ALL',gain:48000,childPay:16000}];
+function fmt(n){return n.toLocaleString();}
+function findRon(me,target,mySeat,direct){const list=mySeat==='parent'?ronParent:ronChild; for(const c of list){if(me+c.point > target-(direct?c.point:0)) return c.name;} return '役満でも届かない';}
+function findTsumo(me,target,mySeat,targetSeat){const list=mySeat==='parent'?tsumoParent:tsumoChild; for(const c of list){let pay=mySeat==='parent'?c.childPay:(targetSeat==='parent'?c.parentPay:c.childPay); if(me+c.gain > target-pay) return c.name;} return '役満ツモでも届かない';}
+function calcCond(){
+  const me=parseInt(document.getElementById('cMe').value||0), target=parseInt(document.getElementById('cTarget').value||0), mySeat=document.getElementById('cMySeat').value, targetSeat=document.getElementById('cTargetSeat').value;
+  const diff=target-me; setText('cDiff',diff>0?fmt(diff)+'点ビハインド':fmt(Math.abs(diff))+'点リード');
+  const ron=findRon(me,target,mySeat,false), direct=findRon(me,target,mySeat,true), tsumo=findTsumo(me,target,mySeat,targetSeat);
+  setText('cRon',ron); setText('cDirect',direct); setText('cTsumo',tsumo);
+  const ok=[ron,direct,tsumo].some(x=>!x.includes('届かない'));
+  setText('cMinimum',diff<0?'すでに上回ってるにゃ':(ok?'どれかでまくれるにゃ':'かなり厳しいにゃ'));
+  setText('cTsumoSub','自分：'+(mySeat==='parent'?'親':'子')+' / 相手：'+(targetSeat==='parent'?'親':'子')+'。ツモ時の相手支払いを反映してるにゃ。');
+}
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tool').forEach(t=>t.classList.remove('active'));tab.classList.add('active');document.getElementById(tab.dataset.tool).classList.add('active');}));
+document.querySelectorAll('select,input').forEach(el=>el.addEventListener('input',()=>{calcFuTool();calcQuick();calcCond();}));
+document.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>{calcFuTool();calcQuick();calcCond();}));
+calcFuTool(); calcQuick(); calcCond();
+</script>
+</body>
+</html>
